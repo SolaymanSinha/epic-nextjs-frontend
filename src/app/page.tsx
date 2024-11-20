@@ -1,50 +1,21 @@
-import { HeroSection } from "@/components/custom/HeroSection";
-import { Button } from "@/components/ui/button";
-import qs from "qs";
+import { FeatureSection } from '@/components/custom/FeatureSection';
+import { HeroSection } from '@/components/custom/HeroSection';
+import { getHomePageData } from '@/data/loaders';
 
-const homePageQuery = qs.stringify(
-  {
-    populate: {
-      blocks: {
-        on: {
-          "layout.hero-section": {
-            populate: {
-              image: {
-                fields: ["url", "alternativeText"] 
-              },
-              link: {
-                populate: true
-              }
-            }
-          }
-        }
-      }
-    },
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const blockRenderer = (block: any) => {
+  switch (block.__component) {
+    case 'layout.hero-section':
+      return <HeroSection data={block} />;
+    case 'layout.feature-section':
+      return <FeatureSection data={block} />;
   }
-)
-
-async function getStrapiData(path: string) {
-  const baseURL = "http://localhost:1337";
-  
-  const url = new URL(path, baseURL);
-  url.search = homePageQuery;
-  console.log(url);
-
-  try {
-    const response = await fetch(url.href);
-    const data = await response.json();
-    console.log(data);
-    return data;
-  } catch (error) {
-    console.error(error);
-  }
-}
+};
 
 export default async function Home() {
-  const strapiData = await getStrapiData("/api/home-page");
-  console.log(strapiData);
-  
-  return (
-    <HeroSection data={strapiData?.data?.blocks[0]} />
-  );
+  const strapiData = await getHomePageData();
+  // console.log(strapiData);
+  const { blocks } = strapiData?.data;
+  return <>{blocks?.map((block: unknown) => blockRenderer(block))}</>;
 }
