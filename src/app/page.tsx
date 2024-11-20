@@ -7,9 +7,9 @@ import { getHomePageData } from '@/data/loaders';
 const blockRenderer = (block: any) => {
   switch (block.__component) {
     case 'layout.hero-section':
-      return <HeroSection data={block} />;
+      return <HeroSection key={block.id} data={block} />;
     case 'layout.feature-section':
-      return <FeatureSection data={block} />;
+      return <FeatureSection key={block.id} data={block} />;
   }
 };
 
